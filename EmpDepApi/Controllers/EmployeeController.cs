@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 
 
@@ -15,54 +16,54 @@ namespace EmpDepApi.Controllers
         // GET: Employee
         [HttpGet]
         [Route("api/employee/")]
-        public IEnumerable<Employee> GetEmployees()
+        public HttpResponseMessage GetEmployees()
         {
             try
             {
                 using (var db = new EmpresaContext())
                 {
-                    return db.Employees.ToList();
+                    return Request.CreateResponse(HttpStatusCode.OK, db.Employees.ToList());
                 }
             } catch(Exception e)
             {
                 Console.WriteLine("Ocorreu um erro: " + e);
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Conflict, "Erro ao acessar servidor");
             }
         }
 
         // GET: Specific Employee
         [Route("api/employee/{id}")]
-        public Employee GetEmployee(int id)
+        public HttpResponseMessage GetEmployee(int id)
         {
             try
             {
                 using (var db = new EmpresaContext())
                 {
-                    return db.Employees.Find(id);
+                    return Request.CreateResponse(HttpStatusCode.OK, db.Employees.Find(id));
                 }
             } catch (Exception e)
             {
                 Console.WriteLine("Ocorreu um erro: " + e);
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Conflict, "Erro ao acessar servidor");
             }
             
         }
 
-        // GET: Specific Employee
+        // GET: Rota para retornar lista de departamentos para preenchimento do droplist
         [Route("api/employee/ListarNomesDepartamentos")]
-        public IEnumerable<Department> GetDepartmentsList()
+        public HttpResponseMessage GetDepartmentsList()
         {
             try
             {
                 using (var db = new EmpresaContext())
                 {
-                    return db.Departments.ToList();
+                    return Request.CreateResponse(HttpStatusCode.OK, db.Departments.ToList());
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("Ocorreu um erro: " + e);
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Conflict, "Erro ao acessar servidor");
             }
         }
 
@@ -70,7 +71,7 @@ namespace EmpDepApi.Controllers
 
         [HttpPost]
         [Route("api/employee/")]
-        public Employee PostEmployee(Employee empregado)
+        public HttpResponseMessage PostEmployee(Employee empregado)
         {
             using (var db = new EmpresaContext())
             {
@@ -78,19 +79,19 @@ namespace EmpDepApi.Controllers
                 {
                     db.Employees.Add(empregado);
                     db.SaveChanges();
-                    return empregado;
+                    return Request.CreateResponse(HttpStatusCode.OK, $"Funcionario(a) {empregado.Nome} adicionado(a) com sucesso.");
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Error: " + e);
-                    return null;
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Erro ao acessar servidor");
                 }
             }
         }
 
         [HttpPut]
         [Route("api/employee/")]
-        public string PutDepartamento(Employee empregado)
+        public HttpResponseMessage PutDepartamento(Employee empregado)
         {
             try
             {
@@ -98,19 +99,19 @@ namespace EmpDepApi.Controllers
                 {
                     db.Entry(empregado).State = EntityState.Modified;
                     db.SaveChanges();
-                    return "Modificação feita com sucesso";
+                    return Request.CreateResponse(HttpStatusCode.OK, "Alteração feita com sucesso.");
                 }
             } catch (Exception e)
             {
                 Console.WriteLine("Ocorreu um erro: " + e);
-                return "Erro ao realizar alteração.";
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Erro ao realizar alteração.");
             }
             
         }
 
         [HttpDelete]
         [Route("api/employee/{id}")]
-        public Employee DeleteDepartamento(int id)
+        public HttpResponseMessage DeleteDepartamento(int id)
         {
             try
             {
@@ -119,12 +120,12 @@ namespace EmpDepApi.Controllers
                     Employee empToDelete = db.Employees.Find(id);
                     db.Employees.Remove(empToDelete);
                     db.SaveChanges();
-                    return empToDelete;
+                    return Request.CreateResponse(HttpStatusCode.OK, "Funcionario deletado com sucesso.");
                 }
             } catch (Exception e)
             {
                 Console.WriteLine("Ocorreu um erro: " + e);
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Erro ao deletar funcionario.");
             }
             
         }

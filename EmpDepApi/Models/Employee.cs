@@ -18,6 +18,5 @@ namespace EmpDepApi.Models
         public string Departamento { get; set; }
         [Required]
         public string DataContratacao { get; set; }
-        public string PathImagem { get; set; }
     }
 }
